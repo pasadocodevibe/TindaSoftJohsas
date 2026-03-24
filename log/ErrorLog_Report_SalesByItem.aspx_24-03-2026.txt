@@ -1,0 +1,6 @@
+-------------------Error Log Start-----------as on 06:12 PM
+WebPage Name :Report_SalesByItem.aspx
+Message: System.InvalidCastException: Object cannot be cast from DBNull to other types.
+   at System.DBNull.System.IConvertible.ToDouble(IFormatProvider provider)
+   at Report_SalesByItem.generate_pdf()
+-------------------End----------------------------

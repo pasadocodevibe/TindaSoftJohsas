@@ -1,0 +1,271 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="distribution/vendor/bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="distribution/vendor/font-awesome/css/font-awesome.min.css">
+    <!-- Fontastic Custom icon font-->
+    <link rel="stylesheet" href="distribution/css/fontastic.css">
+
+      <link rel="stylesheet" href="distribution/fonts/gfont/gfont.css">
+    <!-- Google fonts - Poppins -->
+   
+    <!-- theme stylesheet-->
+  
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="distribution/css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="distribution/img/logopos.ico">
+    <script src="distribution/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- Toastr -->
+<script src="distribution/plugins/toastr/toastr.min.js"></script>
+
+ <link rel="stylesheet" href="distribution/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="distribution/plugins/toastr/toastr.min.css">
+
+
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+
+        <script type="text/javascript" src="distribution/daterangepicker/jquery.min.js"></script>
+<script type="text/javascript" src="distribution/daterangepicker/moment.min.js"></script>
+<script type="text/javascript" src="distribution/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="distribution/daterangepicker/daterangepicker.css" />
+            <style type="text/css">
+.highlight {text-decoration:none; font-weight:bold; 
+color:black; background:yellow;}
+</style>
+         <script type="text/javascript">
+             function getConfirmation_verify(sender, title, message) {
+                 $("#spnTitle3").text(title);
+                 $("#spnMsg3").text(message);
+                 $('#modalPopUp_Delete').modal('show');
+                 $('#btnConfirm3').attr('onclick', "$('#modalPopUp').modal('hide');setTimeout(function(){" + $(sender).prop('href') + "}, 50);");
+                 return false;
+             }
+    </script>
+
+
+     <title>TindaSoft | POS</title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+
+  
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+     <link id="styleselect" runat="server" rel="stylesheet" href="distribution/css/style.default.css" />
+    <div>
+
+    <div class="page">
+      <!-- Main Navbar-->
+      <header class="header">
+        <nav class="navbar">
+          <!-- Search Box-->
+          
+          <div class="container-fluid">
+            <div class="navbar-holder d-flex align-items-center justify-content-between">
+              <!-- Navbar Header-->
+              <div class="navbar-header">
+                <!-- Navbar Brand --><a href="Home.aspx" class="navbar-brand d-none d-sm-inline-block">
+                  <div class="brand-text d-none d-lg-inline-block"><strong> TindaSoft-POS</strong></div>
+                  <div class="brand-text d-none d-sm-inline-block d-lg-none"><strong><asp:Label ID="lbl_storeabbrev" runat="server" Text="store"></asp:Label></strong></div></a>
+                <!-- Toggle Button--><a id="toggle-btn" href="#" class="menu-btn active"><span></span><span></span><span></span></a>
+              
+                 <span><strong><asp:Label ID="lbl_storename" runat="server" Text="My Store"></asp:Label></strong> | <asp:Label ID="lbl_storeaddress" runat="server" Text="Address/Contact" Font-Size="Small"></asp:Label><br />
+               
+                 </span>
+               
+            
+              </div>
+             
+              <div >
+            Welcome!&nbsp;<asp:Label ID="lbl_branch" runat="server" Text=""></asp:Label> &nbsp;<i class="fa fa-user fa-3s" ></i>&nbsp; <asp:LoginName ID="LoginName1" runat="server" Font-Bold="true" 
+                       ForeColor="White" Font-Underline="True" /> &nbsp;&nbsp;<asp:LoginStatus ID="LoginStatus1" runat="server" 
+                              ></asp:LoginStatus>&nbsp;&nbsp;<i class="fa fa-sign-out"></i>
+                              </div>
+         
+              <!-- Navbar Menu -->
+            
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="page-content d-flex align-items-stretch"> 
+        <!-- Side Navbar -->
+        <nav class="side-navbar">
+          <!-- Sidebar Header-->
+          <div class="sidebar-header d-flex align-items-center">
+            <div class="avatar">
+                <asp:ScriptManager ID="ScriptManagersss" runat="server">
+                    </asp:ScriptManager>
+            <asp:UpdatePanel ID="UpdatePanel_formbody" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
+                            <ContentTemplate>
+               <asp:Image ID="impPrev" runat="server"  CssClass="img-fluid rounded-circle" ImageUrl="distribution/img/avataryblank.jpg" Height="50px" Width="50px" />
+             </ContentTemplate>
+              </asp:UpdatePanel>
+           </div>
+            <div class="title">
+              <h1 class="h4"><asp:Label ID="lbl_fullname" runat="server" Text=""></asp:Label></h1>
+              <p><asp:Label ID="lbl_position" runat="server" Text=""></asp:Label></p>
+<asp:HiddenField ID="hd_uid" runat="server"></asp:HiddenField>
+<asp:HiddenField ID="hd_roleid" runat="server"></asp:HiddenField>
+            </div>
+          </div>
+          <!-- Sidebar Navidation Menus--><span class="heading"></span>
+          <ul class="list-unstyled">
+                    <li runat="server" id="home"><a href="Home.aspx"> <i class="icon-home"></i>Dashboard </a></li>
+
+                      <li runat="server" id="pos"><a href="pos1.aspx">  <i class="fa fa-shopping-cart"></i>  Point of Sale </a></li>
+      
+                      <li runat="server" id="sales"><a href="SalesRecord.aspx"> <i class="icon-presentation"></i>Sales Record  </a></li>
+                    <li runat="server" id="cashdrawer"><a href="CheckCashDrawer.aspx"> <i class="fa fa-history"></i>Check Cash Drawer  </a></li>
+                       <li runat="server" id="customer"><a href="Customer.aspx"> <i class="fa fa-group"></i>Customers  </a></li>
+                  
+                    <li runat="server" id="changepass"><a href="Changepass.aspx"> <i class="fa fa-lock"></i>Change Password</a></li>
+             <li runat="server" id="product"><a href="#Uls1" runat="server" id="product_area" data-toggle="collapse"> <i class="fa fa-gift"></i>Product &  Services</a>
+                      <ul id="Uls1" runat="server" class="collapse list-unstyled ">
+                        <li runat="server" id="addproduct"><a href="ProductEntry.aspx">Add item</a></li>
+                             <li runat="server" id="listofitem"><a href="Productlist.aspx">List of Item</a></li>
+                              <li runat="server" id="itemcategory"><a href="pCategory.aspx">Item Category</a></li>
+                      
+                      </ul>
+                    </li>
+                     <li runat="server" id="inventory"><a href="#Uls3" runat="server" id="inventory_area" data-toggle="collapse"> <i class="fa fa-cubes"></i>Inventory</a>
+                      <ul id="Uls3" runat="server" class="collapse list-unstyled ">
+                        <li runat="server" id="stock"><a href="ManageStock.aspx">Manage Stock</a></li>
+                             <li runat="server" id="stocksheet"><a href="mStockSheet.aspx">Stock Sheet</a></li>
+                      
+              
+                      </ul>
+                    </li>
+            <li runat="server" id="expenses"><a href="#Uls4" runat="server" id="expenses_area" data-toggle="collapse"> <i class="fa fa-money"></i>Expenses</a>
+                      <ul id="Uls4" runat="server" class="collapse list-unstyled ">
+                        <li runat="server" id="addexpenses"><a href="ExpensesEntry.aspx">Add new Expenses</a></li>
+                             <li runat="server" id="listofexpenses"><a href="Expenseslist.aspx">List of Expenses</a></li>
+                                 <li runat="server" id="categoryexpenses"><a href="exCategory.aspx">Category expenses</a></li>
+                           
+                      
+              
+                      </ul>
+                    </li>
+
+
+                      <li runat="server" id="report"><a href="#ulreport" runat="server" id="option_report" data-toggle="collapse"> <i class="fa fa-print"></i>Reports </a>
+                      <ul id="ulreport" runat="server" class="collapse list-unstyled ">
+                        <li runat="server" id="reportinventorymovement"><a href="Report_InventoryMovement.aspx">Inventory Movement</a></li>
+                       <li runat="server" id="reportinventoryvaluation"><a href="Report_InventoryValuation.aspx">Inventory Valuation</a></li>
+                       <li runat="server" id="reportincomestatement"><a href="Report_IncomeStatement.aspx">Income Statement</a></li>
+                        <li runat="server" id="reportsalesitem"><a href="Report_SalesByItem.aspx">Sales By Item</a></li>
+                          <li runat="server" id="reportsalessummary"><a href="Report_SalesSummary.aspx">Sales Summary</a></li>
+                            <li runat="server" id="reportsalestax"><a href="Report_SalesTaxLiability.aspx">Sales Tax Liability</a></li>
+                         <li runat="server" id="reportexpense"><a href="Report_expense.aspx">Expense Report</a></li>
+                           <li runat="server" id="reportsoa"><a href="SOA.aspx">Statement of Account</a></li>
+                      </ul>
+                    </li>
+
+                      <li runat="server" id="setup"><a href="#ulsetup" runat="server" id="setup_area" data-toggle="collapse"> <i class="fa fa-gears"></i>Setup </a>
+                      <ul id="ulsetup" runat="server" class="collapse list-unstyled ">
+                        <li runat="server" id="units"><a href="Units.aspx">Units</a></li>
+                       <li runat="server" id="brand"><a href="Brand.aspx">Brand</a></li>
+                       <li runat="server" id="discount"><a href="Discount.aspx">Discount</a></li>
+                        <li runat="server" id="taxes"><a href="Taxes.aspx">Taxes</a></li>
+                           <li runat="server" id="identification"><a href="Identity.aspx">Customer Identity</a></li>
+                               <li runat="server" id="affiliation"><a href="Affiliation.aspx">Customer Affiliation</a></li>
+                         <li runat="server" id="user"><a href="Users.aspx">Users</a></li>
+                            <li runat="server" id="userrole"><a href="UserRole.aspx">User Role </a></li>
+                            <li runat="server" id="settings"><a href="GeneralSettings.aspx">General Settings</a></li>
+                      </ul>
+                    </li>
+                       <li runat="server" id="help"><a href="Help.aspx"> <i class="fa fa-info"></i>About Us/Help</a></li>
+          </ul>
+       
+        
+        </nav>
+
+
+
+
+        <div class="content-inner">
+
+
+         <asp:ContentPlaceHolder id="body" runat="server">
+        
+ 
+
+           </asp:ContentPlaceHolder>
+
+          <!-- Page Footer-->
+          <footer class="main-footer">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-sm-6">
+                  <p>TindaSoft - Point of Sales &copy; 2019</p>
+                </div>
+                <div class="col-sm-6 text-right">
+                  <p>Develop By AtodacOne (Contact us: cadzronz02@gmail.com | 09561679708)</p>
+                  <!-- Please do not remove the backlink to us unless you support further theme's development at https://bootstrapious.com/donate. It is part of the license conditions. Thank you for understanding :)-->
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+
+
+            <div id="modalPopUp_Delete" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                          
+                            <h4 class="modal-title">
+                                <span id="spnTitle3">
+                                </span>
+                            </h4>
+                               <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">
+                         
+                            <p>
+                                <span id="spnMsg3">
+                                </span>                                
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" id="btnConfirm3" class="btn btn-primary">
+                               Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+  <%--   <script src="distribution/vendor/jquery/jquery.min.js"></script>--%>
+    <script src="distribution/vendor/popper.js/umd/popper.min.js"> </script>  
+    <script src="distribution/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  
+  <script src="distribution/vendor/jquery.cookie/jquery.cookie.js"> </script>
+<%--      <script src="distribution/vendor/chart.js/Chart.min.js"></script>
+    <script src="distribution/vendor/jquery-validation/jquery.validate.min.js"></script>
+    <script src="distribution/js/charts-home.js"></script>--%>
+    <!-- Main File-->
+    <script src="distribution/js/front.js"></script>
+       
+    </div>
+    </form>
+</body>
+</html>

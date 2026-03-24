@@ -1,0 +1,121 @@
+/* your styles go here */
+
+.completionList_default {
+/*border:solid 1px #444444;*/
+margin:0px;
+padding:2px;
+height: 200px;
+overflow:auto;
+background-color: #FFFFFF;
+min-width: 200px;
+  border-color: #ccc;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+ 
+   
+}
+
+
+.completionList_medium {
+/*border:solid 1px #444444;*/
+margin:0px;
+padding:2px;
+height: 200px;
+overflow:auto;
+background-color: #FFFFFF;
+min-width: 200px;
+  border-color: #ccc;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+ 
+   
+}
+
+.completionList {
+/*border:solid 1px #444444;*/
+margin:0px;
+padding:2px;
+height: 200px;
+overflow:auto;
+background-color: #FFFFFF;
+min-width: 500px;
+  border-color: #ccc;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+  
+}
+
+.listItem 
+{
+    padding:5px;
+color: #1C1C1C;
+
+ -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 0px;
+line-height:15px;
+}
+
+.frame {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0 none;
+    box-sizing: border-box;
+}
+.framereceipt {
+    display: block;
+    width: 100vw;
+    height: 400px;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0 none;
+    box-sizing: border-box;
+}
+.btn-lg-center {
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+    TEXT-ALIGN: CENTER;
+}

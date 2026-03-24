@@ -1,0 +1,57 @@
+-------------------Error Log Start-----------as on 04:58 PM
+WebPage Name :Home.aspx
+Message: System.InvalidOperationException: Timeout expired.  The timeout period elapsed prior to obtaining a connection from the pool.  This may have occurred because all pooled connections were in use and max pool size was reached.
+   at System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.Open()
+   at repeatedcode.get_usersetid(String user)
+   at Home.get_costofgoodsold(String filterby)
+   at Home.Page_Load(Object sender, EventArgs e)
+-------------------End----------------------------
+-------------------Error Log Start-----------as on 04:58 PM
+WebPage Name :Home.aspx
+Message:System.InvalidOperationException: Timeout expired.  The timeout period elapsed prior to obtaining a connection from the pool.  This may have occurred because all pooled connections were in use and max pool size was reached.
+   at System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.Open()
+   at repeatedcode.get_userroleid(String user)
+   at repeatedcode.access_user(String usname, String sitename, String columncrud)
+   at Home.Page_Load(Object sender, EventArgs e)
+-------------------End----------------------------
+-------------------Error Log Start-----------as on 05:01 PM
+WebPage Name :Home.aspx
+Message:System.InvalidOperationException: Timeout expired.  The timeout period elapsed prior to obtaining a connection from the pool.  This may have occurred because all pooled connections were in use and max pool size was reached.
+   at System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   at System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   at System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.Open()
+   at repeatedcode.get_userroleid(String user)
+   at repeatedcode.access_user(String usname, String sitename, String columncrud)
+   at Home.Page_Load(Object sender, EventArgs e)
+-------------------End----------------------------
+-------------------Error Log Start-----------as on 05:35 PM
+WebPage Name :Home.aspx
+Message:System.InvalidCastException: Object cannot be cast from DBNull to other types.
+   at System.DBNull.System.IConvertible.ToDouble(IFormatProvider provider)
+   at Home.get_costofgoodsold(String filterby)
+   at Home.Page_Load(Object sender, EventArgs e)
+-------------------End----------------------------
+-------------------Error Log Start-----------as on 05:35 PM
+WebPage Name :Home.aspx
+Message:System.InvalidCastException: Object cannot be cast from DBNull to other types.
+   at System.DBNull.System.IConvertible.ToDouble(IFormatProvider provider)
+   at Home.get_costofgoodsold(String filterby)
+   at Home.Page_Load(Object sender, EventArgs e)
+-------------------End----------------------------
+-------------------Error Log Start-----------as on 05:38 PM
+WebPage Name :Home.aspx
+Message:System.InvalidCastException: Object cannot be cast from DBNull to other types.
+   at System.DBNull.System.IConvertible.ToDouble(IFormatProvider provider)
+   at Home.get_costofgoodsold(String filterby)
+   at Home.Page_Load(Object sender, EventArgs e)
+-------------------End----------------------------

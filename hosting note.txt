@@ -1,0 +1,23 @@
+=====http://gg.gg/pos3========
+smarter  asp.net account
+username: tinda3
+password: Passsw0rd@RO12
+expire on: april 8, 2020
+
+=====connection string==========
+"Data Source=SQL5045.site4now.net;
+4Initial Catalog=DB_A550C9_tinda3;
+User Id=DB_A550C9_tinda3_admin;
+Password=Passsw0rd@RO12;"
+
+-----2022--------
+username: tinda4
+password: Passsw0rd@RO12
+expire on: april 8, 2020
+Passsw0rd@RO12
+accountid: tinda4-001
+=====connection string=========
+
+loginid: db_a83ad3_tinda4_admin
+sql: sql5086.site4now.net
+"Data Source=SQL5086.site4now.net;Initial Catalog=db_a83ad3_tinda4;User Id=db_a83ad3_tinda4_admin;Password=Passsw0rd@RO12

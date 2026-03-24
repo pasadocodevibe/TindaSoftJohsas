@@ -1,0 +1,12 @@
+# Ignore compiled DLLs and temporary files
+App_Data/
+obj/
+*.user
+*.suo
+*.pdb
+
+# Ignore your PDF report folder
+temp_report/
+
+# Ignore backup files
+*.bak
