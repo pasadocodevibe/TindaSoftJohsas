@@ -4,9 +4,11 @@ obj/
 *.user
 *.suo
 *.pdb
-
+*.config
 # Ignore your PDF report folder
 temp_report/
 
 # Ignore backup files
 *.bak
+
+#e:\id_ed25519JOHSAS.txt

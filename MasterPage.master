@@ -202,9 +202,6 @@ color:black; background:yellow;}
 
 
          <asp:ContentPlaceHolder id="body" runat="server">
-        
- 
-
            </asp:ContentPlaceHolder>
 
           <!-- Page Footer-->
@@ -212,7 +209,7 @@ color:black; background:yellow;}
             <div class="container-fluid">
               <div class="row">
                 <div class="col-sm-6">
-                  <p>TindaSoft - Point of Sales &copy; 2019</p>
+                  <p>TindaSoft - Point of Sales &copy; 2022</p>
                 </div>
                 <div class="col-sm-6 text-right">
                   <p>Develop By AtodacOne (Contact us: cadzronz02@gmail.com | 09561679708)</p>
