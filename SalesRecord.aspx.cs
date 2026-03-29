@@ -74,8 +74,8 @@ public partial class SalesRecord : System.Web.UI.Page
         {
           
             string entrybyqry = "(SELECT ufullname from  ref_account where uid = invoicentryby)";
-            string sql = "SELECT " + top10 + " trans_invoice.* " +
-        
+            string sql = "SELECT " + top10 + "  " +
+                    "invoiceid,invoicedate,invoiceno,invoicecustomer,invoicesubtotal,invoicediscountamt,invoicetax,invoicetotal,invoinceamounttendered,invoicechanged,invoicenote " +
                   ", " + entrybyqry + " as [entryby] " +
                 //  ", CONVERT(varchar(50), CASE actstatus WHEN 1 THEN 'Active' ELSE 'Inactive' END) as [status]  " +
                 //  ", CASE aclevel WHEN 'ADMIN' THEN 'Administrator' ELSE 'End User' END as [role]  " +

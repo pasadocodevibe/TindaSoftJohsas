@@ -30,7 +30,13 @@ public partial class Home : System.Web.UI.Page
     DateTime pacificdatenow = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Taipei Standard Time");
     protected void ShowMessage(string Message, MessageType type)
     {
-        ScriptManager.RegisterStartupScript(this, this.GetType(), System.Guid.NewGuid().ToString(), "ShowMessage('" + Message + "','" + type + "');", true);
+        string safeMessage = HttpUtility.JavaScriptStringEncode(Message ?? string.Empty);
+        ScriptManager.RegisterStartupScript(
+            this,
+            this.GetType(),
+            System.Guid.NewGuid().ToString(),
+            string.Format("ShowMessage('{0}','{1}');", safeMessage, type),
+            true);
     }
     public void WriteErrorLog(Exception ex)
     {
@@ -61,12 +67,17 @@ public partial class Home : System.Web.UI.Page
     [WebMethod]
     public static List<object> GetChartDataquickstat()
     {
-     
-        string qryproduct = "(select count(productid) from trans_product where producttype='Product' and  prodvoid=0 and prodsetid= " + setidss + " and prodstatus='Active' )";
-        string qryservice = "(select count(productid) from trans_product where producttype='Service' and  prodvoid=0 and prodsetid= " + setidss + " and prodstatus='Active' )";
-        string qrycustomer = "(select count(customerid) from trans_customer where cvoid=0 and csetid= " + setidss + " and cstatus='Active' )";
-        string qryusers = "(select count(uid) from ref_account where uvoid=0 and usetid= " + setidss + " and ustatus='Active' )";
-        string query = "SELECT name , case when name = 'Products' Then " + qryproduct + " when name = 'Services' then  " + qryservice + " when name = 'Customers' then " + qrycustomer + " when name='Users' then " + qryusers + " else '0' end as [total] ";
+        int setId = 0;
+        int.TryParse(setidss, out setId);
+        string qryproduct = "(select count(productid) from trans_product where producttype='Product' and prodvoid=0 and prodsetid=@setid and prodstatus='Active')";
+        string qryservice = "(select count(productid) from trans_product where producttype='Service' and prodvoid=0 and prodsetid=@setid and prodstatus='Active')";
+        string qrycustomer = "(select count(customerid) from trans_customer where cvoid=0 and csetid=@setid and cstatus='Active')";
+        string qryusers = "(select count(uid) from ref_account where uvoid=0 and usetid=@setid and ustatus='Active')";
+        string query = "SELECT name, case when name='Products' then " + qryproduct +
+                       " when name='Services' then " + qryservice +
+                       " when name='Customers' then " + qrycustomer +
+                       " when name='Users' then " + qryusers +
+                       " else 0 end as [total] ";
         query += " FROM view_quickstat   ";
         string constr = ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString;
         List<object> chartData = new List<object>();
@@ -81,6 +92,7 @@ public partial class Home : System.Web.UI.Page
             using (SqlCommand cmd = new SqlCommand(query))
             {
                 cmd.CommandType = CommandType.Text;
+                cmd.Parameters.AddWithValue("@setid", setId);
                 cmd.Connection = con;
                 con.Open();
                 using (SqlDataReader sdr = cmd.ExecuteReader())
@@ -142,8 +154,9 @@ public partial class Home : System.Web.UI.Page
             delete = rp.access_user(User.Identity.Name, "Settings", "pdelete");
             view = rp.access_user(User.Identity.Name, "Settings", "pview");
             print = rp.access_user(User.Identity.Name, "Settings", "pprint");
-            setid = rp.get_usersetid(User.Identity.Name).ToString();
-            setidss = rp.get_usersetid(User.Identity.Name).ToString();
+            int setId = Convert.ToInt32(rp.get_usersetid(User.Identity.Name));
+            setid = setId.ToString();
+            setidss = setid;
             if (!IsPostBack)
             {
              
@@ -155,11 +168,21 @@ public partial class Home : System.Web.UI.Page
                // double plain = Double.Parse(currentPrice, cultureInfo);
 
                // ShowMessage(currentPrice.ToString() + " " + plain.ToString("N2"), MessageType.Success);
-                string setids = rp.get_usersetid(User.Identity.Name).ToString();
-                lbl_qservice.Text = rp.identify_counter(" trans_product WHERE producttype='Service' and prodsetid= " + setids + " and prodvoid=0 and prodstatus='Active' ").ToString("N0");
-                lbl_qproduct.Text = rp.identify_counter(" trans_product WHERE producttype='Product' and prodsetid= " + setids + " and prodvoid=0 and prodstatus='Active' ").ToString("N0");
-                lbl_qcustomer.Text = rp.identify_counter(" trans_customer WHERE csetid= " + setids + " and cvoid=0 and cstatus='Active' ").ToString("N0");
-                lbl_qusers.Text = rp.identify_counter(" ref_account WHERE usetid= " + setids + " and uvoid=0 and ustatus='Active' ").ToString("N0");
+                int setids = setId;
+                lbl_qservice.Text = ExecuteScalarInt(
+                    "SELECT COUNT(productid) FROM trans_product WHERE producttype=@type AND prodsetid=@setid AND prodvoid=0 AND prodstatus='Active'",
+                    new SqlParameter("@type", "Service"),
+                    new SqlParameter("@setid", setids)).ToString("N0");
+                lbl_qproduct.Text = ExecuteScalarInt(
+                    "SELECT COUNT(productid) FROM trans_product WHERE producttype=@type AND prodsetid=@setid AND prodvoid=0 AND prodstatus='Active'",
+                    new SqlParameter("@type", "Product"),
+                    new SqlParameter("@setid", setids)).ToString("N0");
+                lbl_qcustomer.Text = ExecuteScalarInt(
+                    "SELECT COUNT(customerid) FROM trans_customer WHERE csetid=@setid AND cvoid=0 AND cstatus='Active'",
+                    new SqlParameter("@setid", setids)).ToString("N0");
+                lbl_qusers.Text = ExecuteScalarInt(
+                    "SELECT COUNT(uid) FROM ref_account WHERE usetid=@setid AND uvoid=0 AND ustatus='Active'",
+                    new SqlParameter("@setid", setids)).ToString("N0");
 
                 double dsales = get_incomesales("Daily");
                 double ddiscount = get_incomediscount("Daily");
@@ -173,18 +196,46 @@ public partial class Home : System.Web.UI.Page
                 double mgrossprofit = msales + mdiscount - mcostofgoodsold;
                 lbl_ieincomemonth.Text = mgrossprofit.ToString("N2");
 
-                lbl_ieexpense.Text = rp.identify_sum("expamount", " trans_expenses WHERE expdate ='" + pacificdatenow.ToShortDateString() + "' and expsetid= " + setids + " and expvoid=0 ").ToString("N2");
-                lbl_ieexpensemonth.Text = rp.identify_sum("expamount", " trans_expenses WHERE ( MONTH(expdate) ='" + pacificdatenow.Month + "' AND  YEAR(expdate) ='" + pacificdatenow.Year + "') and expsetid= " + setids + " and expvoid=0 ").ToString("N2");
+                DateTime dayStart = pacificdatenow.Date;
+                DateTime dayEnd = dayStart.AddDays(1);
+                DateTime monthStart = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
+                DateTime monthEnd = monthStart.AddMonths(1);
+                lbl_ieexpense.Text = ExecuteScalarDecimal(
+                    "SELECT ISNULL(SUM(expamount),0) FROM trans_expenses WHERE expdate>=@from AND expdate<@to AND expsetid=@setid AND expvoid=0",
+                    new SqlParameter("@from", dayStart),
+                    new SqlParameter("@to", dayEnd),
+                    new SqlParameter("@setid", setids)).ToString("N2");
+                lbl_ieexpensemonth.Text = ExecuteScalarDecimal(
+                    "SELECT ISNULL(SUM(expamount),0) FROM trans_expenses WHERE expdate>=@from AND expdate<@to AND expsetid=@setid AND expvoid=0",
+                    new SqlParameter("@from", monthStart),
+                    new SqlParameter("@to", monthEnd),
+                    new SqlParameter("@setid", setids)).ToString("N2");
 
 
-                lbl_tstotsales.Text = rp.identify_sum("invoicetotal", " trans_invoice WHERE (MONTH(invoicedate) ='" + pacificdatenow.Month + "' AND DAY(invoicedate) ='" + pacificdatenow.Day + "' AND YEAR(invoicedate) ='" + pacificdatenow.Year + "' ) and invoicesetid= " + setids + " and invoicevoid=0 ").ToString("N2");
-                lbl_tstransaction.Text = rp.identify_counter(" trans_invoice WHERE (MONTH(invoicedate) ='" + pacificdatenow.Month + "' AND DAY(invoicedate) ='" + pacificdatenow.Day + "' AND YEAR(invoicedate) ='" + pacificdatenow.Year + "' )  and invoicesetid= " + setids + " and invoicevoid=0 ").ToString("N0");
-                lbl_tsitemsold.Text = rp.identify_counter(" trans_invoicecart WHERE (MONTH(cartdatecreated) ='" + pacificdatenow.Month + "' AND DAY(cartdatecreated) ='" + pacificdatenow.Day + "' AND YEAR(cartdatecreated) ='" + pacificdatenow.Year + "' )  and cartsetid= " + setids + " and cartvoid=0 AND cartstatus='Active' ").ToString("N0");
-                lbl_tscashin.Text = rp.identify_sum("invoicetotal", " trans_invoice WHERE (MONTH(invoicedate) ='" + pacificdatenow.Month + "' AND DAY(invoicedate) ='" + pacificdatenow.Day + "' AND YEAR(invoicedate) ='" + pacificdatenow.Year + "' ) and invoicesetid= " + setids + " and invoicevoid=0 ").ToString("N2");
-                load_top10sold(" top 5 ", setids.ToString());
-                load_top5expenses(" top 5", setids.ToString());
-                load_lowinstock(" ", setids.ToString());
-                load_nearexpiry("", setids.ToString());
+                lbl_tstotsales.Text = ExecuteScalarDecimal(
+                    "SELECT ISNULL(SUM(invoicetotal),0) FROM trans_invoice WHERE invoicedate>=@from AND invoicedate<@to AND invoicesetid=@setid AND invoicevoid=0",
+                    new SqlParameter("@from", dayStart),
+                    new SqlParameter("@to", dayEnd),
+                    new SqlParameter("@setid", setids)).ToString("N2");
+                lbl_tstransaction.Text = ExecuteScalarInt(
+                    "SELECT COUNT(invoiceid) FROM trans_invoice WHERE invoicedate>=@from AND invoicedate<@to AND invoicesetid=@setid AND invoicevoid=0",
+                    new SqlParameter("@from", dayStart),
+                    new SqlParameter("@to", dayEnd),
+                    new SqlParameter("@setid", setids)).ToString("N0");
+                lbl_tsitemsold.Text = ExecuteScalarInt(
+                    "SELECT COUNT(cartid) FROM trans_invoicecart WHERE cartdatecreated>=@from AND cartdatecreated<@to AND cartsetid=@setid AND cartvoid=0 AND cartstatus='Active'",
+                    new SqlParameter("@from", dayStart),
+                    new SqlParameter("@to", dayEnd),
+                    new SqlParameter("@setid", setids)).ToString("N0");
+                lbl_tscashin.Text = ExecuteScalarDecimal(
+                    "SELECT ISNULL(SUM(invoicetotal),0) FROM trans_invoice WHERE invoicedate>=@from AND invoicedate<@to AND invoicesetid=@setid AND invoicevoid=0",
+                    new SqlParameter("@from", dayStart),
+                    new SqlParameter("@to", dayEnd),
+                    new SqlParameter("@setid", setids)).ToString("N2");
+                load_top10sold(5, setids);
+                load_top5expenses(5, setids);
+                load_lowinstock(0, setids);
+                load_nearexpiry(setids);
             }
         }
         catch (Exception ex)
@@ -196,7 +247,7 @@ public partial class Home : System.Web.UI.Page
 
     }
 
-    private void load_top10sold(string top10, string setid)
+    private void load_top10sold(int topN, int setid)
     {
         try
         {
@@ -205,14 +256,18 @@ public partial class Home : System.Web.UI.Page
         using (SqlCommand cmd = new SqlCommand())
         {
             string uomqry1 = "(select case when prodbaseunit !=1 then uomname + ' of ' + CONVERT(VARCHAR(50), prodbaseunit,20)  else uomname end from ref_units where uomid=productunit and uomvoid=0) ";
-            string com = " (Select  productname + ' - ' + " + uomqry1 + " from trans_product where productid =cartproductid and prodsetid = " + setid + " and prodstatus='Active' and prodvoid=0) ";
-        
-            string sql = "SELECT " + top10 + "  " +
+            string com = " (Select productname + ' - ' + " + uomqry1 + " from trans_product where productid=cartproductid and prodsetid=@setid and prodstatus='Active' and prodvoid=0) ";
+            string topClause = topN > 0 ? " TOP (@topN) " : " ";
+            string sql = "SELECT " + topClause +
                 " " + com + " as [name] " +
                  ", sum(cartqty) as [count] " +
                 "FROM trans_invoicecart where (cartvoid = 0 and cartsetid =@setid)  GROUP BY cartproductid ";
            
             cmd.Parameters.AddWithValue("@setid", setid);
+            if (topN > 0)
+            {
+                cmd.Parameters.AddWithValue("@topN", topN);
+            }
             cmd.CommandText = sql;
             cmd.Connection = con;
             using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
@@ -232,7 +287,7 @@ public partial class Home : System.Web.UI.Page
             ShowMessage("Sorry some error occured please contact system administrator or check log file.", MessageType.Error);
         }
     }
-    private void load_top5expenses(string top10, string setid)
+    private void load_top5expenses(int topN, int setid)
     {
         try
         {
@@ -243,12 +298,17 @@ public partial class Home : System.Web.UI.Page
             
                 string name = " (Select excategoryname from ref_expensescategory where excategid =expensecateg) ";
 
-                string sql = "SELECT " + top10 + "  " +
+                string topClause = topN > 0 ? " TOP (@topN) " : " ";
+                string sql = "SELECT " + topClause +
                     " " + name + " as [name] " +
                      ", sum(expamount) as [amount] " +
                     "FROM trans_expenses where (expvoid = 0 and expsetid =@setid)  GROUP BY expensecateg order by [amount] desc ";
 
                 cmd.Parameters.AddWithValue("@setid", setid);
+                if (topN > 0)
+                {
+                    cmd.Parameters.AddWithValue("@topN", topN);
+                }
                 cmd.CommandText = sql;
                 cmd.Connection = con;
                 using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
@@ -268,7 +328,7 @@ public partial class Home : System.Web.UI.Page
             ShowMessage("Sorry some error occured please contact system administrator or check log file.", MessageType.Error);
         }
     }
-    private void load_lowinstock(string top10, string setid)
+    private void load_lowinstock(int topN, int setid)
     {
         try
         {
@@ -278,13 +338,18 @@ public partial class Home : System.Web.UI.Page
             {
                 string uomqry1 = "(select case when prodbaseunit !=1 then uomname + ' of ' + CONVERT(VARCHAR(50), prodbaseunit,20)  else uomname end from ref_units where uomid=productunit and uomvoid=0) ";
                // string com = " (Select ' - ' + " + uomqry1 + " from trans_product where productid =inproductid) ";
-                string stockqry = "(select sum(inventoryqty) from trans_inventory where inproductid=productid and inventoryvoid=0 and inventorysetid= " + setid.ToString() + " )";
-                string sql = "SELECT " + top10 + "  " +
+                string stockqry = "(select sum(inventoryqty) from trans_inventory where inproductid=productid and inventoryvoid=0 and inventorysetid=@setid)";
+                string topClause = topN > 0 ? " TOP (@topN) " : " ";
+                string sql = "SELECT " + topClause +
                     " productname + ' - ' + " + uomqry1 + " as [name] " +
                      ", " + stockqry  + " as [remainingqty] " +
                     "FROM trans_product where (" + stockqry + " <=prodreorderlevel  and prodvoid = 0 and prodsetid =@setid and prodstatus='Active' and producttype='Product') ";
 
                 cmd.Parameters.AddWithValue("@setid", setid);
+                if (topN > 0)
+                {
+                    cmd.Parameters.AddWithValue("@topN", topN);
+                }
                 cmd.CommandText = sql;
                 cmd.Connection = con;
                 using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
@@ -306,141 +371,111 @@ public partial class Home : System.Web.UI.Page
     }
     public double get_incomesales(string filterby)
     {
-        double val = 0;
-        con = new SqlConnection(con.ConnectionString);
-        con.Open();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString))
         using (SqlCommand cmd = new SqlCommand())
         {
-            string filterdate = "";
-            string sql = "select  case when sum(invoicetotal) > 0 then sum(invoicetotal) else 0 end from trans_invoice where invoicesetid=@setid and invoicevoid=0 ";
-            if (!string.IsNullOrEmpty(pacificdatenow.ToShortDateString()))
+            string sql = "select isnull(sum(invoicetotal),0) from trans_invoice where invoicesetid=@setid and invoicevoid=0 ";
+            DateTime from = DateTime.MinValue;
+            DateTime to = DateTime.MinValue;
+            if (filterby == "Daily")
             {
-                DateTime first_date = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
-                DateTime last_date = new DateTime(pacificdatenow.Year, pacificdatenow.Month, DateTime.DaysInMonth(pacificdatenow.Year, pacificdatenow.Month));
-
-                if (filterby == "Daily")
-                {
-                    string dfrom = pacificdatenow.ToShortDateString() + " 00:00:00.000";
-                    string dto = pacificdatenow.ToShortDateString() + " 23:59:59.999";
-                    filterdate = " and (invoicedate BETWEEN '" + dfrom + "' and '" + dto + "' ) ";
-
-                }
-                if (filterby == "Monthly")
-                {
-                    string from = first_date.ToShortDateString() + " 00:00:00.000";
-                    string to = last_date.ToShortDateString() + " 23:59:59.999";
-                    filterdate = " and (invoicedate BETWEEN '" + from + "' and '" + to + "' ) ";
-                }
-                sql += filterdate;
-
+                from = pacificdatenow.Date;
+                to = from.AddDays(1);
+                sql += " and invoicedate>=@from and invoicedate<@to ";
+            }
+            else if (filterby == "Monthly")
+            {
+                from = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
+                to = from.AddMonths(1);
+                sql += " and invoicedate>=@from and invoicedate<@to ";
             }
 
             cmd.Parameters.AddWithValue("@setid", rp.get_usersetid(User.Identity.Name));
-            cmd.CommandText = sql;
-            cmd.Connection = con;
-            rdr = cmd.ExecuteReader();
-            if (rdr.Read())
+            if (filterby == "Daily" || filterby == "Monthly")
             {
-                val = Convert.ToDouble(rdr[0]);
+                cmd.Parameters.AddWithValue("@from", from);
+                cmd.Parameters.AddWithValue("@to", to);
             }
-
+            cmd.CommandText = sql;
+            cmd.Connection = conn;
+            conn.Open();
+            object result = cmd.ExecuteScalar();
+            return (result == null || result == DBNull.Value) ? 0 : Convert.ToDouble(result);
         }
-
-        return val;
     }
     public double get_incomediscount(string filterby)
     {
-        double val = 0;
-        con = new SqlConnection(con.ConnectionString);
-        con.Open();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString))
         using (SqlCommand cmd = new SqlCommand())
         {
-            string filterdate = "";
-            string sql = "select  case when sum(invoicediscountamt) > 0 then sum(invoicediscountamt) else 0 end from trans_invoice where invoicesetid=@setid and invoicevoid=0 ";
-            if (!string.IsNullOrEmpty(pacificdatenow.ToShortDateString()))
+            string sql = "select isnull(sum(invoicediscountamt),0) from trans_invoice where invoicesetid=@setid and invoicevoid=0 ";
+            DateTime from = DateTime.MinValue;
+            DateTime to = DateTime.MinValue;
+            if (filterby == "Daily")
             {
-                DateTime first_date = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
-                DateTime last_date = new DateTime(pacificdatenow.Year, pacificdatenow.Month, DateTime.DaysInMonth(pacificdatenow.Year, pacificdatenow.Month));
-               
-                if (filterby == "Daily")
-                {
-                    string dfrom = pacificdatenow.ToShortDateString() + " 00:00:00.000";
-                    string dto = pacificdatenow.ToShortDateString() + " 23:59:59.999";
-                    filterdate = " and (invoicedate BETWEEN '" + dfrom + "' and '" + dto + "' ) ";
-
-                }
-                if (filterby == "Monthly")
-                {
-                    string from = first_date.ToShortDateString() + " 00:00:00.000";
-                    string to = last_date.ToShortDateString() + " 23:59:59.999";
-                   filterdate = " and (invoicedate BETWEEN '" + from + "' and '" + to + "' ) ";
-                }
-                sql += filterdate;
-
+                from = pacificdatenow.Date;
+                to = from.AddDays(1);
+                sql += " and invoicedate>=@from and invoicedate<@to ";
+            }
+            else if (filterby == "Monthly")
+            {
+                from = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
+                to = from.AddMonths(1);
+                sql += " and invoicedate>=@from and invoicedate<@to ";
             }
 
             cmd.Parameters.AddWithValue("@setid", rp.get_usersetid(User.Identity.Name));
-            cmd.CommandText = sql;
-            cmd.Connection = con;
-            rdr = cmd.ExecuteReader();
-            if (rdr.Read())
+            if (filterby == "Daily" || filterby == "Monthly")
             {
-                val = Convert.ToDouble(rdr[0]);
+                cmd.Parameters.AddWithValue("@from", from);
+                cmd.Parameters.AddWithValue("@to", to);
             }
-
+            cmd.CommandText = sql;
+            cmd.Connection = conn;
+            conn.Open();
+            object result = cmd.ExecuteScalar();
+            return (result == null || result == DBNull.Value) ? 0 : Convert.ToDouble(result);
         }
-
-        return val;
     }
     public double get_costofgoodsold(string filterby)
     {
-        double val = 0;
-        con = new SqlConnection(con.ConnectionString);
-        con.Open();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString))
         using (SqlCommand cmd = new SqlCommand())
         {
-            string filterdate = "";
-            string cost = "(select inventorycostperunit from trans_inventory where invent_soldcartid=A.cartid) ";
-
-            string sql = "select   " + cost + " * cartqty  " +
-            " from trans_invoicecart AS A, trans_invoice as B where A.cartinvoiceid=B.invoiceid  AND B.invoicesetid=@setid and B.invoicevoid=0 ";
-            if (!string.IsNullOrEmpty(pacificdatenow.ToShortDateString()))
+            string sql = "select isnull(sum(isnull(I.inventorycostperunit,0) * A.cartqty),0) " +
+                         "from trans_invoicecart A " +
+                         "inner join trans_invoice B on A.cartinvoiceid=B.invoiceid " +
+                         "left join trans_inventory I on I.invent_soldcartid=A.cartid " +
+                         "where B.invoicesetid=@setid and B.invoicevoid=0 ";
+            DateTime from = DateTime.MinValue;
+            DateTime to = DateTime.MinValue;
+            if (filterby == "Daily")
             {
-                DateTime first_date = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
-                DateTime last_date = new DateTime(pacificdatenow.Year, pacificdatenow.Month, DateTime.DaysInMonth(pacificdatenow.Year, pacificdatenow.Month));
-               
-                if (filterby == "Daily")
-                {
-                    string dfrom = pacificdatenow.ToShortDateString() + " 00:00:00.000";
-                    string dto = pacificdatenow.ToShortDateString() + " 23:59:59.999";
-                    filterdate = " and (B.invoicedate BETWEEN '" + dfrom + "' and '" + dto + "' ) ";
-
-                }
-                if (filterby == "Monthly")
-                {
-                    string from = first_date.ToShortDateString() + " 00:00:00.000";
-                    string to = last_date.ToShortDateString() + " 23:59:59.999";
-                   filterdate = " and (B.invoicedate BETWEEN '" + from + "' and '" + to + "' ) ";
-                }
-                sql += filterdate;
-
+                from = pacificdatenow.Date;
+                to = from.AddDays(1);
+                sql += " and B.invoicedate>=@from and B.invoicedate<@to ";
+            }
+            else if (filterby == "Monthly")
+            {
+                from = new DateTime(pacificdatenow.Year, pacificdatenow.Month, 1);
+                to = from.AddMonths(1);
+                sql += " and B.invoicedate>=@from and B.invoicedate<@to ";
             }
 
             cmd.Parameters.AddWithValue("@setid", rp.get_usersetid(User.Identity.Name));
-            cmd.CommandText = sql;
-            cmd.Connection = con;
-            rdr = cmd.ExecuteReader();
-            while (rdr.Read())
+            if (filterby == "Daily" || filterby == "Monthly")
             {
-                if (rdr[0] != DBNull.Value)
-                        val += Convert.ToDouble(rdr[0]);
+                cmd.Parameters.AddWithValue("@from", from);
+                cmd.Parameters.AddWithValue("@to", to);
             }
-
+            cmd.CommandText = sql;
+            cmd.Connection = conn;
+            conn.Open();
+            object result = cmd.ExecuteScalar();
+            return (result == null || result == DBNull.Value) ? 0 : Convert.ToDouble(result);
         }
-
-        return val;
     }
-    private void load_nearexpiry(string top10, string setid)
+    private void load_nearexpiry(int setid)
     {
         try
         {
@@ -474,6 +509,36 @@ public partial class Home : System.Web.UI.Page
             WriteErrorLog(ex);
 
             ShowMessage("Sorry some error occured please contact system administrator or check log file.", MessageType.Error);
+        }
+    }
+
+    private int ExecuteScalarInt(string sql, params SqlParameter[] parameters)
+    {
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString))
+        using (SqlCommand cmd = new SqlCommand(sql, conn))
+        {
+            if (parameters != null && parameters.Length > 0)
+            {
+                cmd.Parameters.AddRange(parameters);
+            }
+            conn.Open();
+            object result = cmd.ExecuteScalar();
+            return (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+        }
+    }
+
+    private decimal ExecuteScalarDecimal(string sql, params SqlParameter[] parameters)
+    {
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString))
+        using (SqlCommand cmd = new SqlCommand(sql, conn))
+        {
+            if (parameters != null && parameters.Length > 0)
+            {
+                cmd.Parameters.AddRange(parameters);
+            }
+            conn.Open();
+            object result = cmd.ExecuteScalar();
+            return (result == null || result == DBNull.Value) ? 0m : Convert.ToDecimal(result);
         }
     }
 

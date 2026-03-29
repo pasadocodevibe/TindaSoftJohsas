@@ -32,7 +32,13 @@ public partial class _Default : System.Web.UI.Page
     DateTime pacificdatenow = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Taipei Standard Time");
     protected void ShowMessage(string Message, MessageType type)
     {
-        ScriptManager.RegisterStartupScript(this, this.GetType(), System.Guid.NewGuid().ToString(), "ShowMessage('" + Message + "','" + type + "');", true);
+        string safeMessage = HttpUtility.JavaScriptStringEncode(Message ?? string.Empty);
+        ScriptManager.RegisterStartupScript(
+            this,
+            this.GetType(),
+            System.Guid.NewGuid().ToString(),
+            string.Format("ShowMessage('{0}','{1}');", safeMessage, type),
+            true);
     }
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -79,20 +85,30 @@ public partial class _Default : System.Web.UI.Page
             con.Close();
         }
 
-        con.Open();
-        string stms = "SELECT COUNT(*) FROM ref_account Where usname ='" + Login2.UserName + "' and ustatus ='Inactive' ";
-        sqlcmd = new SqlCommand(stms, con);
-        Int32 counts = Convert.ToInt32(sqlcmd.ExecuteScalar());
-        if (counts > 0)
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["myconnection"].ConnectionString))
         {
-            Login2.FailureText = "Your account was deactivated!";
-            return;
-        }
+            conn.Open();
+            using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM ref_account WHERE usname=@USNAME AND ustatus='Inactive'", conn))
+            {
+                cmd.Parameters.AddWithValue("@USNAME", Login2.UserName);
+                Int32 counts = Convert.ToInt32(cmd.ExecuteScalar());
+                if (counts > 0)
+                {
+                    Login2.FailureText = "Your account was deactivated!";
+                    return;
+                }
+            }
 
-        if (rp.identify_counter(" ref_account where usname='" + Login2.UserName + "' and uvoid=1 ") > 0 )
-        {
-            Login2.FailureText = "Your acccount already deleted!";
-            return;
+            using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM ref_account WHERE usname=@USNAME AND uvoid=1", conn))
+            {
+                cmd.Parameters.AddWithValue("@USNAME", Login2.UserName);
+                Int32 deleted = Convert.ToInt32(cmd.ExecuteScalar());
+                if (deleted > 0)
+                {
+                    Login2.FailureText = "Your acccount already deleted!";
+                    return;
+                }
+            }
         }
         if (Login2.UserName != "" && Login2.Password != "")
         {
